@@ -1,0 +1,28 @@
+# Python cache and temporary files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+env/
+venv/
+.venv/
+
+# IDE settings
+.idea/
+.vscode/
+
+# Logs and temporary files
+*.log
+*.tmp
+.DS_Store
+
+# Secrets
+*.env
+config.yaml
+
+# Output files
+*.xlsx
+*.csv
+output/
