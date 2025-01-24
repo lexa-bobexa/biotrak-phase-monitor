@@ -5,13 +5,20 @@ import urllib.parse
 from datetime import datetime
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, 
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("app.log", mode="w"),
+        logging.StreamHandler()
+    ]
+)
 
 def get_trials(df_input, id_column):
     """Retrieve trials for specific interventions and return filtered data."""
     results = []
     base_url = "https://clinicaltrials.gov/api/v2/studies"
-    page_size = 600  # Adjust based on expected data volume
+    page_size = 1000  # Adjust based on expected data volume
     european_countries = {
         'Austria', 'Belgium', 'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France', 
         'Germany', 'Greece', 'Hungary', 'Iceland', 'Ireland', 'Italy', 'Latvia', 'Lithuania', 'Luxembourg', 'Malta', 'Netherlands', 
@@ -76,40 +83,27 @@ def get_trials(df_input, id_column):
                 break
     return results
 
-def load_interventions_from_excel(file_path):
-    """Load all sheets and intervention names and associated product ids from an Excel file."""
-    try:
-        sheets = pd.read_excel(file_path, sheet_name=None) # Read all sheets into a dictionary
-        return sheets
-    except Exception as e:
-        logging.error(f"Failed to load Excel file: {e}")
-        return {}
-
 def save_results_to_excel(results_dict, output_dir, input_sheet_names):
-    """Save the filtered results to an Excel file, removing duplicate NCT numbers."""
+    """
+    Save the filtered results to an Excel file, removing duplicate NCT numbers.
+
+    Args:
+        results_dict (dict): A dictionary of {sheet_name: pd.DataFrame} to save.
+        output_dir (str): The directory where the output file will be saved.
+        input_sheet_names (iterable): The sheet names processed, used to name the sheets in the output file.
+    """
     try:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         output_path = f"{output_dir}/biotrak_scrape_{timestamp}.xlsx"
 
         with pd.ExcelWriter(output_path) as writer:
-            for sheet_name, df_results in results_dict.items():
-                df_results.drop_duplicates(subset=['NCT Number'], inplace=True)  # Remove duplicates based on NCT Number
-                df_results.to_excel(writer, sheet_name=sheet_name, index=False)
+            for sheet_name in input_sheet_names:
+                df_results = results_dict.get(sheet_name)
+                if df_results is not None:
+                    # Remove duplicates based on NCT Number
+                    df_results.drop_duplicates(subset=['NCT Number'], inplace=True)
+                    df_results.to_excel(writer, sheet_name=sheet_name, index=False)
         
         logging.info(f"Results saved to {output_path}")
     except Exception as e:
         logging.error(f"Failed to save results to Excel: {e}")
-
-def main():
-    input_file_path = '/Users/lexkopf/Documents/code_projects/biotrak_phase_monitor/DataScraping_2025-01-21.xlsx'
-    output_directory = '/Users/lexkopf/Documents/code_projects/biotrak_phase_monitor'
-
-    df_input = load_interventions_from_excel(input_file_path)
-    if not df_input.empty:
-        results = get_trials(df_input)
-        save_results_to_excel(results, output_directory)
-    else:
-        logging.info("No intervention names found to process.")
-
-if __name__ == '__main__':
-    main()

@@ -69,3 +69,19 @@ def validate_excel_content(sheets, required_columns_mapping):
         validation_results[sheet_name] = (True, "File content is valid")
 
     return validation_results
+
+def find_id_column(columns):
+    """
+    Find the relevant ID column in the given column names.
+    Returns the matching column name if found, otherwise None.
+
+    This function checks for either "TC Scrape Number" or "bioTRAK Product ID".
+    If the column name contains additional text (e.g., "TC Scrape Number (Duplicates...)"),
+    it will be matched as well.
+    """
+    for col in columns:
+        if "TC Scrape Number" in col:
+            return col
+        elif "bioTRAK Product ID" in col:
+            return col
+    return None
