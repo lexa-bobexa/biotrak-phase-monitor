@@ -38,6 +38,40 @@ def main():
         login_page()
         return
 
+    # Add help/documentation section to sidebar
+    with st.sidebar.expander("📚 Help & Documentation", expanded=False):
+        st.markdown("""
+        ### Getting Started
+        
+        **Input File Requirements:**
+        - Excel file with columns:
+          - 'Product Name'
+          - 'Original Phase'
+          - Your specified ID column
+        
+        **Features:**
+        - Fetches clinical trial data from ClinicalTrials.gov
+        - Filters trials in US, Canada, and European countries
+        - Caches API responses for faster processing
+        - Exports results to Excel with automatic duplicate removal
+        
+        **Output Includes:**
+        - Product ID and name
+        - Trial phase information
+        - NCT number
+        - Sponsor name
+        - Trial status
+        - Location information
+        - Start and end dates
+        - FDA regulation status
+        - Conditions studied
+        
+        **Notes:**
+        - API responses are cached for improved performance
+        - Results are automatically filtered by region
+        - Duplicate NCT numbers are removed from output
+        """)
+
     # Header section with improved layout
     st.markdown('<div class="header-section">', unsafe_allow_html=True)
     col1, col2, col3 = st.columns([0.6, 0.2, 0.2])

@@ -2,6 +2,7 @@ import pandas as pd
 import requests
 import urllib.parse
 from datetime import datetime
+from typing import Dict, List, Union
 from config import BASE_URL, EUROPEAN_COUNTRIES
 from logic.logging_config import logger
 from cachecontrol import CacheControl
@@ -16,8 +17,35 @@ os.makedirs(CACHE_DIR, exist_ok=True)
 session = requests.Session()
 cached_session = CacheControl(session, cache=FileCache(CACHE_DIR))
 
-def get_trials(df_input, id_column):
-    """Retrieve trials for specific interventions and return filtered data."""
+def get_trials(df_input: pd.DataFrame, id_column: str) -> List[Dict[str, Union[str, bool]]]:
+    """
+    Retrieve clinical trials data for specific interventions from ClinicalTrials.gov API.
+    
+    This function queries the ClinicalTrials.gov API for each intervention in the input DataFrame,
+    filters the results to include only trials in the US, Canada, or European countries,
+    and returns a list of dictionaries containing the relevant trial information.
+    
+    Args:
+        df_input (pd.DataFrame): Input DataFrame containing intervention information.
+            Must contain columns: 'Product Name', 'Original Phase', and the specified id_column.
+        id_column (str): Name of the column containing the product ID.
+    
+    Returns:
+        List[Dict[str, Union[str, bool]]]: List of dictionaries, where each dictionary contains:
+            - Product ID and name
+            - Trial phase information
+            - NCT number
+            - Sponsor name
+            - Trial status
+            - Location information
+            - Start and end dates
+            - FDA regulation status
+            - Conditions studied
+    
+    Raises:
+        KeyError: If required columns are missing from df_input
+        requests.exceptions.RequestException: If API requests fail
+    """
     results = []
     page_size = 1000  # Adjust based on expected data volume
     european_countries = set(EUROPEAN_COUNTRIES)  # Convert list to set for efficient lookups
@@ -86,14 +114,23 @@ def get_trials(df_input, id_column):
                 break
     return results
 
-def save_results_to_excel(results_dict, output_dir, input_sheet_names):
+def save_results_to_excel(results_dict: Dict[str, pd.DataFrame], output_dir: str, input_sheet_names: List[str]) -> None:
     """
     Save the filtered results to an Excel file, removing duplicate NCT numbers.
-
+    
     Args:
-        results_dict (dict): A dictionary of {sheet_name: pd.DataFrame} to save.
-        output_dir (str): The directory where the output file will be saved.
-        input_sheet_names (iterable): The sheet names processed, used to name the sheets in the output file.
+        results_dict (Dict[str, pd.DataFrame]): Dictionary mapping sheet names to DataFrames
+            containing the trial results to save.
+        output_dir (str): Directory path where the output file will be saved.
+        input_sheet_names (List[str]): List of sheet names to include in the output file.
+    
+    Returns:
+        None
+    
+    Raises:
+        FileNotFoundError: If output_dir does not exist
+        PermissionError: If unable to write to output_dir
+        Exception: For other Excel writing errors
     """
     try:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
