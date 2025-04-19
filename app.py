@@ -2,22 +2,16 @@ import streamlit as st
 import pandas as pd
 import tempfile
 import os
-import logging
 import time
 from datetime import datetime
 from logic.file_operations import load_excel_file, validate_excel_content, find_id_column
-from logic.data_processing import get_trials, save_results_to_excel
+from logic.data_processing import get_trials
 from logic.auth import login_page
 from logic.monitoring import log_usage, show_admin_dashboard
 from config import BASE_URL, EUROPEAN_COUNTRIES
+from logic.logging_config import logger
+from logic.session_manager import SessionManager
 from io import BytesIO
-
-# Configure logging
-logging.basicConfig(
-    filename='app.log',
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
 
 # Configure the Streamlit page
 st.set_page_config(
@@ -25,6 +19,9 @@ st.set_page_config(
     page_icon="📊",
     layout="wide"
 )
+
+# Initialize session state
+SessionManager.initialize_session_state()
 
 # Custom CSS
 st.markdown("""
@@ -97,25 +94,14 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-def check_remember_me():
-    """Check if the user has a valid remember me cookie."""
-    if "remember_me" in st.session_state and "remember_me_expiry" in st.session_state:
-        if time.time() < st.session_state["remember_me_expiry"]:
-            return True
-    return False
-
 def main():
-    # Initialize session state for authentication
-    if "authenticated" not in st.session_state:
-        st.session_state["authenticated"] = False
-
     # Check remember me cookie
-    if not st.session_state["authenticated"] and check_remember_me():
-        st.session_state["authenticated"] = True
+    if not SessionManager.get_state("authenticated") and SessionManager.check_remember_me():
+        SessionManager.set_state("authenticated", True)
         st.rerun()
 
     # Show appropriate page based on authentication state
-    if not st.session_state["authenticated"]:
+    if not SessionManager.get_state("authenticated"):
         login_page()
         return
 
@@ -130,27 +116,26 @@ def main():
             </div>
         """, unsafe_allow_html=True)
     with col2:
-        if st.session_state["role"] == "admin":
-            if st.session_state.get("show_admin", False):
+        if SessionManager.get_state("role") == "admin":
+            if SessionManager.get_state("show_admin"):
                 if st.button("Back to Main", key="back_to_main"):
-                    st.session_state["show_admin"] = False
+                    SessionManager.set_state("show_admin", False)
                     st.rerun()
             else:
                 if st.button("Admin Dashboard", key="admin_dashboard"):
-                    st.session_state["show_admin"] = True
+                    SessionManager.set_state("show_admin", True)
                     st.rerun()
     with col3:
         if st.button("Logout", key="logout"):
-            for key in list(st.session_state.keys()):
-                del st.session_state[key]
+            SessionManager.clear_session()
             st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
 
     # Welcome message
-    st.markdown(f"<h3 style='color: #FAFAFA;'>Welcome, {st.session_state['username']}! 👋</h3>", unsafe_allow_html=True)
+    st.markdown(f"<h3 style='color: #FAFAFA;'>Welcome, {SessionManager.get_state('username')}! 👋</h3>", unsafe_allow_html=True)
 
     # Main content area
-    if st.session_state.get("show_admin", False):
+    if SessionManager.get_state("show_admin"):
         show_admin_dashboard()
     else:
         # File upload section
@@ -173,7 +158,7 @@ def main():
             try:
                 # Load the Excel file
                 sheets = load_excel_file(tmp_path)
-                logging.info(f"Successfully loaded file with {len(sheets)} sheets")
+                logger.info(f"Successfully loaded file with {len(sheets)} sheets")
                 
                 # Show available sheets
                 st.success(f"File loaded successfully! Found {len(sheets)} sheets.")
@@ -188,31 +173,21 @@ def main():
                 )
 
                 if selected_sheets:
-                    # Initialize session state for processing
-                    if "processing" not in st.session_state:
-                        st.session_state.processing = False
-                    if "cancel_processing" not in st.session_state:
-                        st.session_state.cancel_processing = False
-
-                    # Create a container for the processing UI
-                    processing_container = st.container()
-                    
                     # Start processing button with improved styling
-                    if not st.session_state.processing:
-                        st.markdown("""
+                    if not SessionManager.get_state("processing"):
+                        st.markdown(f"""
                             <div style='margin: 2rem 0;'>
                                 <h3>Ready to Process</h3>
                                 <p style='color: #666;'>Selected {len(selected_sheets)} sheets for processing</p>
                             </div>
                         """, unsafe_allow_html=True)
                         if st.button("Start Processing", key="start_processing"):
-                            st.session_state.processing = True
-                            st.session_state.cancel_processing = False
+                            SessionManager.set_state("processing", True)
                             st.rerun()
                     
                     # Processing UI with enhanced visual feedback
-                    if st.session_state.processing:
-                        with processing_container:
+                    if SessionManager.get_state("processing"):
+                        with st.container():
                             st.markdown("""
                                 <div style='background-color: #262730; padding: 2rem; border-radius: 10px; margin: 2rem 0; border: 1px solid #333;'>
                                     <h3>Processing Data</h3>
@@ -228,7 +203,7 @@ def main():
                             with st.spinner("Processing your data...this will take several minutes"):
                                 # Cancel button with improved styling
                                 if st.button("Cancel Processing", key="cancel_processing"):
-                                    st.session_state.cancel_processing = True
+                                    SessionManager.set_state("processing", False)
                                     st.rerun()
                                 
                                 # Filter selected sheets
@@ -249,10 +224,8 @@ def main():
                                 
                                 for i, (sheet_name, df) in enumerate(selected_data.items()):
                                     # Check for cancellation
-                                    if st.session_state.cancel_processing:
+                                    if not SessionManager.get_state("processing"):
                                         st.warning("Processing cancelled by user")
-                                        st.session_state.processing = False
-                                        st.session_state.cancel_processing = False
                                         st.rerun()
                                     
                                     # Update progress
@@ -271,7 +244,7 @@ def main():
                                             id_column = find_id_column(df.columns)
                                             if id_column is None:
                                                 st.error(f"Could not find ID column in sheet: {sheet_name}. Please ensure the sheet contains either 'TC Scrape Number' or 'bioTRAK Product ID' column.")
-                                                logging.error(f"Could not find ID column in sheet: {sheet_name}")
+                                                logger.error(f"Could not find ID column in sheet: {sheet_name}")
                                                 continue
                                             
                                             # Process the sheet
@@ -280,19 +253,19 @@ def main():
                                             # Convert the list of dictionaries to a DataFrame
                                             if trial_data:  # Only create DataFrame if we have data
                                                 results[sheet_name] = pd.DataFrame(trial_data)
-                                                logging.info(f"Successfully processed sheet: {sheet_name}")
+                                                logger.info(f"Successfully processed sheet: {sheet_name}")
                                             else:
                                                 st.warning(f"No trial data found for sheet: {sheet_name}")
-                                                logging.warning(f"No trial data found for sheet: {sheet_name}")
+                                                logger.warning(f"No trial data found for sheet: {sheet_name}")
                                         except Exception as e:
-                                            logging.error(f"Error processing sheet {sheet_name}: {str(e)}")
+                                            logger.error(f"Error processing sheet {sheet_name}: {str(e)}")
                                             st.error(f"Error processing sheet {sheet_name}: {str(e)}")
                                             continue
                         
                         # Calculate processing time
                         processing_time = time.time() - start_time
                         
-                        if results and not st.session_state.cancel_processing:
+                        if results and SessionManager.get_state("processing"):
                             # Create output Excel file in memory
                             output = BytesIO()
                             with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -304,7 +277,7 @@ def main():
                             output_filename = f"processed_trials_{timestamp}.xlsx"
                             
                             # Log successful processing with processing time
-                            log_usage(st.session_state["username"], "processing_complete", {
+                            log_usage(SessionManager.get_state("username"), "processing_complete", {
                                 "filename": uploaded_file.name,
                                 "sheets_processed": len(results),
                                 "total_sheets": len(selected_sheets),
@@ -327,16 +300,15 @@ def main():
                                 mime="application/vnd.ms-excel",
                                 key="download_results"
                             )
-                        elif not st.session_state.cancel_processing:
+                        elif SessionManager.get_state("processing"):
                             st.warning("No valid results were generated from the processing.")
                         
                         # Reset processing state
-                        st.session_state.processing = False
-                        st.session_state.cancel_processing = False
+                        SessionManager.set_state("processing", False)
 
             except Exception as e:
                 error_msg = f"An error occurred: {str(e)}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 st.error(error_msg)
             
             finally:
@@ -344,7 +316,7 @@ def main():
                 try:
                     os.unlink(tmp_path)
                 except Exception as e:
-                    logging.warning(f"Failed to delete temporary file: {str(e)}")
+                    logger.warning(f"Failed to delete temporary file: {str(e)}")
 
 if __name__ == "__main__":
     main() 
