@@ -4,6 +4,17 @@ import urllib.parse
 from datetime import datetime
 from config import BASE_URL, EUROPEAN_COUNTRIES
 from logic.logging_config import logger
+from cachecontrol import CacheControl
+from cachecontrol.caches import FileCache
+import os
+
+# Create a cache directory if it doesn't exist
+CACHE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.cache')
+os.makedirs(CACHE_DIR, exist_ok=True)
+
+# Create a session with caching enabled
+session = requests.Session()
+cached_session = CacheControl(session, cache=FileCache(CACHE_DIR))
 
 def get_trials(df_input, id_column):
     """Retrieve trials for specific interventions and return filtered data."""
@@ -31,7 +42,7 @@ def get_trials(df_input, id_column):
                 url += f"&pageToken={page_token}"
 
             try:
-                response = requests.get(url)
+                response = cached_session.get(url)
                 if response.status_code == 200:
                     data = response.json()
                     page_token = data.get('nextPageToken')

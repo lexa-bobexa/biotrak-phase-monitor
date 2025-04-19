@@ -11,6 +11,7 @@ from logic.monitoring import log_usage, show_admin_dashboard
 from config import BASE_URL, EUROPEAN_COUNTRIES
 from logic.logging_config import logger
 from logic.session_manager import SessionManager
+from logic.styles import MAIN_STYLES, PROCESSING_STYLES, READY_STYLES, SUCCESS_STYLES, PROGRESS_STATUS_STYLES
 from io import BytesIO
 
 # Configure the Streamlit page
@@ -20,81 +21,13 @@ st.set_page_config(
     layout="wide"
 )
 
-# Initialize session state
-SessionManager.initialize_session_state()
-
-# Custom CSS
-st.markdown("""
-    <style>
-    .main {
-        padding: 2rem;
-        background-color: #0E1117;
-    }
-    .stButton>button {
-        width: 100%;
-        border-radius: 5px;
-        height: 3em;
-        font-weight: 600;
-        background-color: #1E88E5;
-        color: white;
-        border: none;
-    }
-    .stButton>button:hover {
-        background-color: #1565C0;
-    }
-    .stProgress > div > div > div > div {
-        background-color: #1E88E5;
-    }
-    .stAlert {
-        border-radius: 5px;
-        background-color: #262730;
-    }
-    .upload-section {
-        background-color: #262730;
-        padding: 2rem;
-        border-radius: 10px;
-        margin-bottom: 2rem;
-        border: 1px solid #333;
-    }
-    .header-section {
-        margin-bottom: 2rem;
-    }
-    /* Dark mode specific styles */
-    .stMarkdown {
-        color: #FAFAFA;
-    }
-    .stTextInput>div>div>input {
-        background-color: #262730;
-        color: #FAFAFA;
-    }
-    .stSelectbox>div>div>select {
-        background-color: #262730;
-        color: #FAFAFA;
-    }
-    .stFileUploader>div>div>div>div {
-        background-color: #262730;
-        color: #FAFAFA;
-    }
-    .stMultiSelect>div>div>div>div {
-        background-color: #262730;
-        color: #FAFAFA;
-    }
-    .success-message {
-        background-color: #1B5E20;
-        color: #FAFAFA;
-    }
-    .warning-message {
-        background-color: #E65100;
-        color: #FAFAFA;
-    }
-    .error-message {
-        background-color: #B71C1C;
-        color: #FAFAFA;
-    }
-    </style>
-""", unsafe_allow_html=True)
+# Apply main styles
+st.markdown(MAIN_STYLES, unsafe_allow_html=True)
 
 def main():
+    # Initialize session state
+    SessionManager.initialize_session_state()
+
     # Check remember me cookie
     if not SessionManager.get_state("authenticated") and SessionManager.check_remember_me():
         SessionManager.set_state("authenticated", True)
@@ -175,12 +108,7 @@ def main():
                 if selected_sheets:
                     # Start processing button with improved styling
                     if not SessionManager.get_state("processing"):
-                        st.markdown(f"""
-                            <div style='margin: 2rem 0;'>
-                                <h3>Ready to Process</h3>
-                                <p style='color: #666;'>Selected {len(selected_sheets)} sheets for processing</p>
-                            </div>
-                        """, unsafe_allow_html=True)
+                        st.markdown(READY_STYLES.format(sheets_count=len(selected_sheets)), unsafe_allow_html=True)
                         if st.button("Start Processing", key="start_processing"):
                             SessionManager.set_state("processing", True)
                             st.rerun()
@@ -188,12 +116,7 @@ def main():
                     # Processing UI with enhanced visual feedback
                     if SessionManager.get_state("processing"):
                         with st.container():
-                            st.markdown("""
-                                <div style='background-color: #262730; padding: 2rem; border-radius: 10px; margin: 2rem 0; border: 1px solid #333;'>
-                                    <h3>Processing Data</h3>
-                                    <p style='color: #B0B0B0;'>This may take several minutes. Please wait...</p>
-                                </div>
-                            """, unsafe_allow_html=True)
+                            st.markdown(PROCESSING_STYLES, unsafe_allow_html=True)
                                 
                             # Progress bar and status with improved styling
                             progress_bar = st.progress(0)
@@ -231,12 +154,14 @@ def main():
                                     # Update progress
                                     progress = (i + 1) / len(selected_data)
                                     progress_bar.progress(progress)
-                                    status_text.markdown(f"""
-                                        <div style='margin: 1rem 0;'>
-                                            <p style='color: #666;'>Processing sheet {i+1} of {len(selected_data)}</p>
-                                            <p style='font-weight: bold;'>{sheet_name}</p>
-                                        </div>
-                                    """, unsafe_allow_html=True)
+                                    status_text.markdown(
+                                        PROGRESS_STATUS_STYLES.format(
+                                            current=i+1,
+                                            total=len(selected_data),
+                                            sheet_name=sheet_name
+                                        ),
+                                        unsafe_allow_html=True
+                                    )
                                     
                                     if validation_results[sheet_name][0]:  # if sheet is valid
                                         try:
@@ -285,12 +210,10 @@ def main():
                             })
                             
                             # Success message with improved styling
-                            st.markdown("""
-                                <div class="success-message" style='padding: 2rem; border-radius: 10px; margin: 2rem 0;'>
-                                    <h3>Processing Complete! 🎉</h3>
-                                    <p>Your data has been processed successfully in {:.2f} seconds.</p>
-                                </div>
-                            """.format(processing_time), unsafe_allow_html=True)
+                            st.markdown(
+                                SUCCESS_STYLES.format(processing_time=processing_time),
+                                unsafe_allow_html=True
+                            )
                             
                             # Download button with improved styling
                             st.download_button(

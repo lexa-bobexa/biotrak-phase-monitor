@@ -1,21 +1,20 @@
 import streamlit as st
 import time
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Literal
 from logic.logging_config import logger
 
 class SessionManager:
     """Manages Streamlit session state initialization and access."""
     
     # Define default values for session state variables
-    DEFAULT_STATE = {
+    DEFAULT_STATE: Dict[str, Any] = {
         "authenticated": False,
-        "role": None,
-        "username": None,
+        "role": Optional[Literal["admin", "user"]],
+        "username": Optional[str],
         "show_admin": False,
         "processing": False,
-        "cancel_processing": False,
         "remember_me": False,
-        "remember_me_expiry": None
+        "remember_me_expiry": Optional[float]
     }
 
     @classmethod

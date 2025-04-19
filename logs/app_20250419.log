@@ -226,3 +226,98 @@ st.chat_input, and st.form cannot be set using st.session_state.
 2025-04-19 13:50:00 - root - INFO - Successfully processed sheet: BT
 2025-04-19 13:50:00 - root - INFO - Successfully processed sheet: BT
 2025-04-19 13:50:00 - root - INFO - Successfully processed sheet: BT
+2025-04-19 14:25:08 - root - INFO - Cleared all session state variables
+2025-04-19 14:25:08 - root - INFO - Cleared all session state variables
+2025-04-19 14:25:08 - root - INFO - Cleared all session state variables
+2025-04-19 14:25:08 - root - INFO - Cleared all session state variables
+2025-04-19 14:25:08 - root - INFO - Cleared all session state variables
+2025-04-19 14:25:08 - root - INFO - Cleared all session state variables
+2025-04-19 14:25:08 - root - INFO - Cleared all session state variables
+2025-04-19 14:29:59 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmpyn12g_mr.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:29:59 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmpyn12g_mr.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:29:59 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmpyn12g_mr.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:29:59 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmpyn12g_mr.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:29:59 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmpyn12g_mr.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:29:59 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmpyn12g_mr.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:29:59 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmpyn12g_mr.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:29:59 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmpyn12g_mr.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:29:59 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:29:59 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:29:59 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:29:59 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:29:59 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:29:59 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:29:59 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:29:59 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmpvjs9703d.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmpvjs9703d.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmpvjs9703d.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmpvjs9703d.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmpvjs9703d.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmpvjs9703d.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmpvjs9703d.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmpvjs9703d.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmppdqo0m_c.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmppdqo0m_c.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmppdqo0m_c.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmppdqo0m_c.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmppdqo0m_c.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmppdqo0m_c.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmppdqo0m_c.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmppdqo0m_c.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:07 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmp231vx9gr.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmp231vx9gr.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmp231vx9gr.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmp231vx9gr.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmp231vx9gr.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmp231vx9gr.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmp231vx9gr.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmp231vx9gr.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmptds1ebyc.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmptds1ebyc.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmptds1ebyc.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmptds1ebyc.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmptds1ebyc.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmptds1ebyc.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmptds1ebyc.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file: /var/folders/5n/c3ykg8tx0kdbdyj5mgdmjfbw0000gn/T/tmptds1ebyc.xlsx with sheets: ['BT', 'FD Sheet']
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:30:20 - root - INFO - Successfully loaded file with 2 sheets
+2025-04-19 14:36:59 - root - INFO - Successfully processed sheet: BT
+2025-04-19 14:36:59 - root - INFO - Successfully processed sheet: BT
+2025-04-19 14:36:59 - root - INFO - Successfully processed sheet: BT
+2025-04-19 14:36:59 - root - INFO - Successfully processed sheet: BT
+2025-04-19 14:36:59 - root - INFO - Successfully processed sheet: BT
+2025-04-19 14:36:59 - root - INFO - Successfully processed sheet: BT
+2025-04-19 14:36:59 - root - INFO - Successfully processed sheet: BT
+2025-04-19 14:36:59 - root - INFO - Successfully processed sheet: BT
