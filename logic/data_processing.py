@@ -38,6 +38,8 @@ def get_trials(df_input, id_column):
 
         while True:
             encoded_intervention_name = urllib.parse.quote(intervention_name.strip(), safe="")
+            # Replace URL-encoded brackets with \[ and \] for clinicaltrials.gov search syntax
+            encoded_intervention_name = encoded_intervention_name.replace('%5B', '\\[').replace('%5D', '\\]')
             url = f"{base_url}?query.intr={encoded_intervention_name}&format=json&pageSize={page_size}"
             if page_token:
                 url += f"&pageToken={page_token}"

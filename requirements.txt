@@ -1,11 +1,5 @@
-requests
-pandas
-logging
-openpyxl
-
-python 3.10.4
-OpenSSL 3.3.2
-
-base_url = "https://clinicaltrials.gov/api/v2/studies"
-
-Countries in Europe: 'Austria', 'Belgium', 'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France', 'Germany', 'Greece', 'Hungary', 'Iceland', 'Ireland', 'Italy', 'Latvia', 'Lithuania', 'Luxembourg', 'Malta', 'Netherlands', 'Norway', 'Poland', 'Portugal', 'Romania', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Switzerland', 'United Kingdom'
+streamlit==1.31.1
+pandas==2.2.0
+openpyxl==3.1.2
+requests==2.31.0
+python-dotenv==1.0.0
