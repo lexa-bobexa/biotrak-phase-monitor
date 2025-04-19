@@ -20,7 +20,7 @@ def init_usage_logs():
         with open(USAGE_LOGS_PATH, 'w') as f:
             json.dump([], f)
 
-def log_usage(user_email, action, details=None):
+def log_usage(username, action, details=None):
     """Log a user action."""
     if not os.path.exists(USAGE_LOGS_PATH):
         init_usage_logs()
@@ -30,7 +30,7 @@ def log_usage(user_email, action, details=None):
     
     log_entry = {
         "timestamp": datetime.now().isoformat(),
-        "user": user_email,
+        "user": username,
         "action": action,
         "details": details or {}
     }
