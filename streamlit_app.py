@@ -1,4 +1,5 @@
 import logging
+import os
 from datetime import datetime
 from typing import Dict, List, Tuple
 
@@ -9,6 +10,7 @@ from logic.data_processing import create_results_workbook_bytes
 from logic.workflow import get_workbook_validation_report, process_workbook
 
 LOGGER = logging.getLogger(__name__)
+APP_VERSION = os.getenv("APP_VERSION", "v1.1.0")
 
 if not logging.getLogger().handlers:
     logging.basicConfig(
@@ -42,6 +44,7 @@ def main() -> None:
     st.set_page_config(page_title="Biotrak Phase Monitor", layout="wide")
     st.title("Biotrak Phase Monitor")
     st.caption("Upload an Excel file, query ClinicalTrials.gov, and download a cleaned output workbook.")
+    st.caption(f"App version: {APP_VERSION}")
 
     if "result_bytes" not in st.session_state:
         st.session_state.result_bytes = None
@@ -54,6 +57,7 @@ def main() -> None:
 
     with st.sidebar:
         st.header("Processing Options")
+        st.caption(f"Version: {APP_VERSION}")
         trial_end_cutoff_years = st.number_input(
             "Trial end cutoff (years)",
             min_value=1,
