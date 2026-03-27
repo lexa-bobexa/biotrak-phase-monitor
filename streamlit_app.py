@@ -11,6 +11,8 @@ from logic.workflow import get_workbook_validation_report, process_workbook
 
 LOGGER = logging.getLogger(__name__)
 APP_VERSION = os.getenv("APP_VERSION", "v1.1.0")
+DEFAULT_APP_USERNAME = os.getenv("APP_USERNAME", "admin")
+DEFAULT_APP_PASSWORD = os.getenv("APP_PASSWORD", "admin123")
 
 if not logging.getLogger().handlers:
     logging.basicConfig(
@@ -18,6 +20,39 @@ if not logging.getLogger().handlers:
         format="%(asctime)s - %(levelname)s - %(message)s",
         handlers=[logging.FileHandler("app.log"), logging.StreamHandler()],
     )
+
+
+def _get_secret_or_default(secret_key: str, default_value: str) -> str:
+    try:
+        return st.secrets.get(secret_key, default_value)
+    except Exception:
+        return default_value
+
+
+def _initialize_auth_state() -> None:
+    if "authenticated" not in st.session_state:
+        st.session_state.authenticated = False
+    if "username" not in st.session_state:
+        st.session_state.username = None
+
+
+def _show_login_page() -> None:
+    st.title("BT Phase Monitor Login")
+    st.caption(f"App version: {APP_VERSION}")
+
+    col_left, col_center, col_right = st.columns([1, 1.2, 1])
+    with col_center:
+        username = st.text_input("Username", key="login_username")
+        password = st.text_input("Password", type="password", key="login_password")
+        if st.button("Login", type="primary", use_container_width=True):
+            valid_username = _get_secret_or_default("auth_username", DEFAULT_APP_USERNAME)
+            valid_password = _get_secret_or_default("auth_password", DEFAULT_APP_PASSWORD)
+            if username == valid_username and password == valid_password:
+                st.session_state.authenticated = True
+                st.session_state.username = username
+                st.rerun()
+            else:
+                st.error("Invalid username or password")
 
 
 def _process_uploaded_file(
@@ -41,7 +76,13 @@ def _process_uploaded_file(
 
 
 def main() -> None:
-    st.set_page_config(page_title="Biotrak Phase Monitor", layout="wide")
+    st.set_page_config(page_title="Biotrak Phase Monitor", page_icon="📊", layout="wide")
+    _initialize_auth_state()
+
+    if not st.session_state.authenticated:
+        _show_login_page()
+        return
+
     st.title("Biotrak Phase Monitor")
     st.caption("Upload an Excel file, query ClinicalTrials.gov, and download a cleaned output workbook.")
     st.caption(f"App version: {APP_VERSION}")
@@ -56,6 +97,12 @@ def main() -> None:
         st.session_state.run_metrics = None
 
     with st.sidebar:
+        st.caption(f"Logged in as: {st.session_state.username}")
+        if st.button("Logout"):
+            st.session_state.authenticated = False
+            st.session_state.username = None
+            st.rerun()
+        st.divider()
         st.header("Processing Options")
         st.caption(f"Version: {APP_VERSION}")
         trial_end_cutoff_years = st.number_input(
