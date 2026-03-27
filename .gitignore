@@ -1,0 +1,33 @@
+# Python cache and bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+env/
+venv/
+.venv/
+env9/
+
+# IDE settings
+.idea/
+.vscode/
+
+# Logs and temporary files
+*.log
+*.tmp
+.DS_Store
+
+# Secrets and local config
+*.env
+config.yaml
+
+# Generated outputs
+*.xlsx
+*.csv
+output/
+
+# Test and tooling caches
+.pytest_cache/
+.mypy_cache/
