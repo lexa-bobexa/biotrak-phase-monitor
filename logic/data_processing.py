@@ -6,6 +6,7 @@ from typing import Callable, Dict, Iterable, Optional
 import pandas as pd
 import requests
 import urllib.parse
+from openpyxl.styles import Font
 
 LOGGER = logging.getLogger(__name__)
 EUROPEAN_COUNTRIES = {
@@ -44,11 +45,89 @@ EUROPEAN_COUNTRIES = {
 TARGET_COUNTRIES = {"United States", "Canada"} | EUROPEAN_COUNTRIES
 
 
+def _ctgov_study_url(nct_number: str) -> str:
+    return f"https://clinicaltrials.gov/study/{str(nct_number).strip()}"
+
+
+def _normalize_phase_token(phase_value: str) -> str:
+    normalized = str(phase_value).strip().upper()
+    mapping = {
+        "EARLY_PHASE1": "Early Phase 1",
+        "PHASE1": "Phase 1",
+        "PHASE2": "Phase 2",
+        "PHASE3": "Phase 3",
+        "PHASE4": "Phase 4",
+    }
+    return mapping.get(normalized, normalized.replace("_", " ").title())
+
+
+def _format_ctgov_phase(phases: Optional[Iterable[str]]) -> str:
+    """
+    Return a user-facing phase string, preserving multi-phase studies.
+
+    Example: ["PHASE1", "PHASE2"] -> "Phase 1/Phase 2"
+    """
+    if not phases:
+        return "Not Available"
+
+    if isinstance(phases, str):
+        phases = [phases]
+
+    normalized_phases = []
+    seen = set()
+    for phase in phases:
+        phase_label = _normalize_phase_token(phase)
+        if phase_label not in seen:
+            normalized_phases.append(phase_label)
+            seen.add(phase_label)
+
+    if not normalized_phases:
+        return "Not Available"
+
+    return "/".join(normalized_phases)
+
+
+def _parse_ctgov_date(date_value: object) -> Optional[pd.Timestamp]:
+    if pd.isna(date_value):
+        return None
+    date_text = str(date_value).strip()
+    if not date_text:
+        return None
+
+    parsed = pd.to_datetime(date_text, errors="coerce", utc=True)
+    if pd.isna(parsed):
+        return None
+    return parsed.tz_localize(None)
+
+
+def _passes_trial_end_cutoff(
+    trial_end_date: object,
+    cutoff_years: int = 8,
+    include_unknown_end_dates: bool = True,
+    reference_timestamp: Optional[pd.Timestamp] = None,
+) -> bool:
+    """
+    Return True when trial end date is within cutoff window.
+
+    Trials with unknown or unparseable end dates respect include_unknown_end_dates.
+    """
+    parsed_end_date = _parse_ctgov_date(trial_end_date)
+    if parsed_end_date is None:
+        return include_unknown_end_dates
+
+    reference = reference_timestamp if reference_timestamp is not None else pd.Timestamp.utcnow()
+    cutoff = reference.tz_localize(None) - pd.DateOffset(years=cutoff_years)
+    return parsed_end_date >= cutoff
+
+
 def get_trials(
     df_input: pd.DataFrame,
     id_column: str,
     progress_callback: Optional[Callable[[int, str], None]] = None,
     request_timeout_seconds: int = 30,
+    trial_end_cutoff_years: int = 8,
+    include_unknown_end_dates: bool = True,
+    reference_timestamp: Optional[pd.Timestamp] = None,
 ) -> list[dict]:
     """Retrieve ClinicalTrials.gov studies for each product row."""
     results = []
@@ -90,6 +169,17 @@ def get_trials(
                     countries = {location["country"] for location in locations if "country" in location}
 
                     if countries.intersection(TARGET_COUNTRIES):
+                        trial_end_date = status_info.get("completionDateStruct", {}).get(
+                            "date", "Not Available"
+                        )
+                        if not _passes_trial_end_cutoff(
+                            trial_end_date,
+                            cutoff_years=trial_end_cutoff_years,
+                            include_unknown_end_dates=include_unknown_end_dates,
+                            reference_timestamp=reference_timestamp,
+                        ):
+                            continue
+
                         details = {
                             id_column: product_id,
                             "Product Name": intervention_name,
@@ -102,15 +192,14 @@ def get_trials(
                                 ]
                             ),
                             "original_phase": original_phase,
-                            "Phase on CT.gov": design_info.get("phases", ["Not Available"])[0],
+                            "Phase on CT.gov": _format_ctgov_phase(design_info.get("phases")),
                             "NCT Number": study_info["nctId"],
                             "sponsor_name": sponsor_info["leadSponsor"]["name"],
                             "Status on CT.gov": status_info["overallStatus"],
+                            "Why Stopped": status_info.get("whyStopped", "Not Available"),
                             "Location on CT.gov": ", ".join(sorted(countries)),
                             "Trial Start Date": status_info.get("startDateStruct", {}).get("date", "Not Available"),
-                            "Trial End Date": status_info.get(
-                                "completionDateStruct", {}
-                            ).get("date", "Not Available"),
+                            "Trial End Date": trial_end_date,
                             "Is FDA Regulated Drug": oversight_info.get("isFdaRegulatedDrug", False),
                             "Conditions": ", ".join(conditions_info.get("conditions", [])),
                         }
@@ -147,6 +236,22 @@ def create_results_workbook_bytes(
 
             deduplicated = dataframe.drop_duplicates(subset=["NCT Number"])
             deduplicated.to_excel(writer, sheet_name=sheet_name[:31], index=False)
+
+            worksheet = writer.sheets[sheet_name[:31]]
+            if "NCT Number" in deduplicated.columns:
+                nct_column_index = deduplicated.columns.get_loc("NCT Number") + 1
+                header_offset = 1  # row 1 is header in to_excel output
+                for row_index, nct_value in enumerate(deduplicated["NCT Number"], start=1):
+                    if pd.isna(nct_value):
+                        continue
+                    nct_text = str(nct_value).strip()
+                    if not nct_text:
+                        continue
+                    cell = worksheet.cell(row=row_index + header_offset, column=nct_column_index)
+                    cell.hyperlink = _ctgov_study_url(nct_text)
+                    cell.style = "Hyperlink"
+                    # Keep explicit visual style even if workbook theme differs.
+                    cell.font = Font(color="0563C1", underline="single")
 
     return buffer.getvalue()
 

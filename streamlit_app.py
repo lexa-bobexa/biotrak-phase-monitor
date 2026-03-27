@@ -1,11 +1,12 @@
 import logging
 from datetime import datetime
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
+import pandas as pd
 import streamlit as st
 
 from logic.data_processing import create_results_workbook_bytes
-from logic.workflow import process_workbook
+from logic.workflow import get_workbook_validation_report, process_workbook
 
 LOGGER = logging.getLogger(__name__)
 
@@ -18,15 +19,23 @@ if not logging.getLogger().handlers:
 
 
 def _process_uploaded_file(
-    file_bytes: bytes, progress_bar: "st.delta_generator.DeltaGenerator"
-) -> Tuple[bytes, str, List[str]]:
+    file_bytes: bytes,
+    progress_bar: "st.delta_generator.DeltaGenerator",
+    trial_end_cutoff_years: int,
+    include_unknown_end_dates: bool,
+) -> Tuple[bytes, str, List[str], Dict[str, int]]:
     def _on_progress(progress_value: float, message: str) -> None:
         progress_bar.progress(progress_value, text=message)
 
-    results_dict, summary_messages = process_workbook(file_bytes, progress_callback=_on_progress)
+    results_dict, summary_messages, metrics = process_workbook(
+        file_bytes,
+        progress_callback=_on_progress,
+        trial_end_cutoff_years=trial_end_cutoff_years,
+        include_unknown_end_dates=include_unknown_end_dates,
+    )
     workbook_bytes = create_results_workbook_bytes(results_dict, results_dict.keys())
     output_filename = f"biotrak_scrape_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
-    return workbook_bytes, output_filename, summary_messages
+    return workbook_bytes, output_filename, summary_messages, metrics
 
 
 def main() -> None:
@@ -40,8 +49,41 @@ def main() -> None:
         st.session_state.result_filename = None
     if "summary_messages" not in st.session_state:
         st.session_state.summary_messages = []
+    if "run_metrics" not in st.session_state:
+        st.session_state.run_metrics = None
+
+    with st.sidebar:
+        st.header("Processing Options")
+        trial_end_cutoff_years = st.number_input(
+            "Trial end cutoff (years)",
+            min_value=1,
+            max_value=20,
+            value=8,
+            step=1,
+            help="Studies ending before this cutoff are excluded.",
+        )
+        include_unknown_end_dates = st.checkbox(
+            "Include studies with unknown end date",
+            value=True,
+            help="If disabled, studies missing completion date are excluded.",
+        )
 
     uploaded_file = st.file_uploader("Upload input workbook", type=["xlsx", "xls"])
+    uploaded_file_bytes = uploaded_file.getvalue() if uploaded_file is not None else None
+
+    if uploaded_file_bytes:
+        try:
+            validation_report = get_workbook_validation_report(uploaded_file_bytes)
+            with st.expander("Pre-run validation", expanded=True):
+                metric_col_1, metric_col_2, metric_col_3 = st.columns(3)
+                metric_col_1.metric("Total sheets", validation_report["total_sheets"])
+                metric_col_2.metric("Valid sheets", validation_report["valid_sheets"])
+                metric_col_3.metric(
+                    "Non-empty valid sheets", validation_report["non_empty_valid_sheets"]
+                )
+                st.dataframe(pd.DataFrame(validation_report["rows"]), use_container_width=True)
+        except Exception as exc:
+            st.error(f"Could not validate uploaded workbook: {exc}")
 
     action_col, reset_col = st.columns([1, 1])
     with action_col:
@@ -55,6 +97,7 @@ def main() -> None:
             st.session_state.result_bytes = None
             st.session_state.result_filename = None
             st.session_state.summary_messages = []
+            st.session_state.run_metrics = None
             st.rerun()
 
     if run_processing:
@@ -63,18 +106,34 @@ def main() -> None:
         else:
             progress_bar = st.progress(0.0, text="Preparing workbook...")
             try:
-                file_bytes = uploaded_file.getvalue()
-                result_bytes, result_filename, summary_messages = _process_uploaded_file(
-                    file_bytes,
+                result_bytes, result_filename, summary_messages, run_metrics = _process_uploaded_file(
+                    uploaded_file_bytes,
                     progress_bar,
+                    trial_end_cutoff_years=trial_end_cutoff_years,
+                    include_unknown_end_dates=include_unknown_end_dates,
                 )
                 st.session_state.result_bytes = result_bytes
                 st.session_state.result_filename = result_filename
                 st.session_state.summary_messages = summary_messages
+                st.session_state.run_metrics = run_metrics
                 st.success("Processing complete. Download your output workbook below.")
             except Exception as exc:
                 LOGGER.exception("Processing failed")
                 st.error(f"Processing failed: {exc}")
+
+    if st.session_state.run_metrics:
+        st.subheader("Run summary")
+        summary_col_1, summary_col_2, summary_col_3 = st.columns(3)
+        summary_col_1.metric("Processed sheets", st.session_state.run_metrics["processed_sheets"])
+        summary_col_2.metric("Output rows", st.session_state.run_metrics["output_rows"])
+        summary_col_3.metric("Skipped (missing ID)", st.session_state.run_metrics["skipped_missing_id"])
+
+        details_col_1, details_col_2, details_col_3 = st.columns(3)
+        details_col_1.metric("Total sheets", st.session_state.run_metrics["total_sheets"])
+        details_col_2.metric("Valid sheets", st.session_state.run_metrics["valid_sheets"])
+        details_col_3.metric(
+            "Non-empty valid sheets", st.session_state.run_metrics["non_empty_valid_sheets"]
+        )
 
     if st.session_state.summary_messages:
         with st.expander("Validation and processing summary", expanded=False):
